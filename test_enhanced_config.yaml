@@ -1,0 +1,26 @@
+# Test Configuration for Enhanced AI Analysis
+git_providers:
+  - name: github
+    api_token: "YOUR_GITHUB_TOKEN_HERE"
+    base_url: "https://api.github.com"
+
+ai:
+  enabled: false  # Disabled for now - add your OpenAI API key to enable
+  provider: openai
+  api_key: "your_openai_api_key_here"  # Replace with your actual OpenAI API key
+  model: "gpt-3.5-turbo"
+  max_tokens: 2000
+  temperature: 0.3
+
+analysis:
+  enable_security_scan: true
+  enable_performance_scan: true
+  enable_style_scan: true
+  enable_complexity_scan: true
+
+log_level: INFO
+
+# Enable review creation for detailed feedback
+review:
+  enable_summary_comment: false  # Disabled for testing
+  enable_inline_comments: false  # Disabled for testing

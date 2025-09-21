@@ -1,0 +1,124 @@
+# PR Review Agent Configuration Example
+# Copy this file to config.yaml and customize with your settings
+
+# Git providers configuration
+# Add your git hosting service credentials here
+git_providers:
+  # GitHub configuration
+  - name: github
+    api_token: "your_github_personal_access_token"
+    base_url: "https://api.github.com"
+
+  # GitLab configuration
+  - name: gitlab
+    api_token: "your_gitlab_personal_access_token"
+    base_url: "https://gitlab.com/api/v4"
+
+  # Bitbucket configuration
+  - name: bitbucket
+    api_token: "your_bitbucket_app_password"
+    base_url: "https://api.bitbucket.org/2.0"
+
+# AI configuration
+# Choose your AI provider and add API credentials
+ai:
+  enabled: true
+  provider: openai  # Options: openai, anthropic
+  api_key: "your_openai_api_key"  # or ANTHROPIC_API_KEY
+  model: "gpt-4"  # For OpenAI: gpt-4, gpt-3.5-turbo
+                  # For Anthropic: claude-3-opus, claude-3-sonnet, claude-3-haiku
+  max_tokens: 2000
+  temperature: 0.3
+
+# Analysis configuration
+# Enable/disable different types of analysis
+analysis:
+  enable_security_scan: true
+  enable_performance_scan: false  # Coming soon
+  enable_style_scan: false        # Coming soon
+  enable_complexity_scan: false   # Coming soon
+
+# Logging configuration
+log_level: INFO  # Options: DEBUG, INFO, WARNING, ERROR
+log_file: "pr_review_agent.log"
+
+# Review configuration
+review:
+  # Maximum number of files to analyze in a single PR
+  max_files: 50
+
+  # Minimum score threshold for automatic approval
+  auto_approve_threshold: 0.8
+
+  # Enable inline comments on specific lines
+  enable_inline_comments: true
+
+  # Enable review summary comment
+  enable_summary_comment: true
+
+  # Custom labels to add to the review
+  labels:
+    - "ai-reviewed"
+    - "automated-review"
+
+# Security scan configuration
+security:
+  # Enable specific security checks
+  checks:
+    sql_injection: true
+    command_injection: true
+    path_traversal: true
+    hardcoded_secrets: true
+    insecure_random: true
+    insecure_deserialization: true
+
+  # Exclude patterns (files or directories to skip)
+  exclude_patterns:
+    - "test_*.py"
+    - "tests/"
+    - "*.min.js"
+    - "node_modules/"
+
+# Performance scan configuration (when available)
+performance:
+  # Enable specific performance checks
+  checks:
+    inefficient_algorithms: true
+    memory_optimization: true
+    database_optimization: true
+    io_optimization: true
+
+  # Performance thresholds
+  thresholds:
+    max_cyclomatic_complexity: 10
+    max_function_length: 50
+    max_file_length: 500
+
+# Style scan configuration (when available)
+style:
+  # Code style rules
+  rules:
+    line_length: 88  # PEP 8 standard
+    require_docstrings: true
+    require_type_hints: false
+    max_blank_lines: 2
+
+  # Formatting preferences
+  formatting:
+    use_single_quotes: false
+    use_trailing_comma: true
+    indent_size: 4
+
+# Output configuration
+output:
+  # Default output format
+  format: text  # Options: text, json, markdown
+
+  # Include detailed analysis in output
+  include_detailed_analysis: true
+
+  # Include AI reasoning in output
+  include_ai_reasoning: true
+
+  # Color output (for terminal)
+  color_output: true

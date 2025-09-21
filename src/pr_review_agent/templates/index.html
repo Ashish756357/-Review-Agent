@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PR Review Agent</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 2rem; }
+      label { display:block; margin-top: .5rem }
+      input[type=text] { width: 400px }
+      textarea { width: 100%; height: 200px }
+      .btn { margin-top: 1rem }
+    </style>
+  </head>
+  <body>
+    <h1>Run PR Review</h1>
+    <div>
+      <label>Provider: <input id="provider" value="github" type="text"></label>
+      <label>Owner: <input id="owner" value="" type="text"></label>
+      <label>Repo: <input id="repo" value="" type="text"></label>
+      <label>PR Number: <input id="pr" value="" type="text"></label>
+      <label>Config path (optional): <input id="config" type="text"></label>
+      <button id="runBtn" class="btn" type="button">Run (AJAX)</button>
+    </div>
+
+    <div id="result" style="margin-top:1rem;display:none">
+      <h2>Result</h2>
+      <p><strong>Score:</strong> <span id="score"></span></p>
+      <p><strong>Grade:</strong> <span id="grade"></span></p>
+      <p><strong>Issues:</strong> <span id="issues"></span></p>
+      <h3>Review Body</h3>
+      <pre id="body"></pre>
+    </div>
+
+    <script>
+      document.getElementById('runBtn').addEventListener('click', async () => {
+        const provider = document.getElementById('provider').value
+        const owner = document.getElementById('owner').value
+        const repo = document.getElementById('repo').value
+        const pr = document.getElementById('pr').value
+        const config = document.getElementById('config').value
+
+        const payload = { provider, owner, repo, pr }
+        if (config) payload.config = config
+
+        const res = await fetch('/api/review', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+
+        if (!res.ok) {
+          const text = await res.text()
+          alert('Review failed: ' + text)
+          return
+        }
+
+        const data = await res.json()
+        document.getElementById('score').innerText = data.overall_score
+        document.getElementById('grade').innerText = data.grade
+        document.getElementById('issues').innerText = data.issues
+        document.getElementById('body').innerText = data.review_body || ''
+        document.getElementById('result').style.display = 'block'
+      })
+    </script>
+  </body>
+</html>

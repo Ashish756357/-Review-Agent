@@ -1,0 +1,474 @@
+Metadata-Version: 2.4
+Name: pr-review-agent
+Version: 0.1.0
+Summary: AI-powered pull request review agent for multiple git platforms
+Home-page: https://github.com/your-org/pr-review-agent
+Author: PR Review Agent Team
+Author-email: PR Review Agent <agent@supernova.com>
+Project-URL: Homepage, https://github.com/supernova/pr-review-agent
+Project-URL: Repository, https://github.com/supernova/pr-review-agent
+Project-URL: Issues, https://github.com/supernova/pr-review-agent/issues
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: requests>=2.28.0
+Requires-Dist: PyYAML>=6.0
+Requires-Dist: python-dotenv>=0.19.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: httpx>=0.24.0
+Requires-Dist: asyncio-mqtt>=0.12.0
+Requires-Dist: aiofiles>=0.21.0
+Requires-Dist: pathspec>=0.11.0
+Requires-Dist: colorama>=0.4.6
+Requires-Dist: rich>=13.0.0
+Requires-Dist: openai>=1.0.0
+Requires-Dist: anthropic>=0.7.0
+Requires-Dist: bandit>=1.7.0
+Requires-Dist: flake8>=6.0.0
+Requires-Dist: black>=23.0.0
+Requires-Dist: isort>=5.12.0
+Requires-Dist: mypy>=1.0.0
+Requires-Dist: pytest>=7.0.0
+Requires-Dist: pytest-asyncio>=0.21.0
+Requires-Dist: pytest-cov>=4.0.0
+Requires-Dist: pytest-mock>=3.10.0
+Provides-Extra: dev
+Requires-Dist: pre-commit>=3.0.0; extra == "dev"
+Requires-Dist: tox>=4.0.0; extra == "dev"
+Requires-Dist: sphinx>=6.0.0; extra == "dev"
+Requires-Dist: sphinx-rtd-theme>=1.2.0; extra == "dev"
+Provides-Extra: github
+Requires-Dist: PyGithub>=1.58.0; extra == "github"
+Provides-Extra: gitlab
+Requires-Dist: python-gitlab>=3.15.0; extra == "gitlab"
+Provides-Extra: bitbucket
+Requires-Dist: atlassian-python-api>=3.39.0; extra == "bitbucket"
+Provides-Extra: all
+Requires-Dist: pr-review-agent[bitbucket,dev,github,gitlab]; extra == "all"
+Dynamic: author
+Dynamic: home-page
+Dynamic: requires-python
+
+# PR Review Agent
+
+An AI-powered pull request review agent that provides comprehensive code analysis and intelligent feedback across multiple git platforms (GitHub, GitLab, Bitbucket).
+
+## Features
+
+- **Multi-platform support**: GitHub, GitLab, and Bitbucket integration
+- **AI-powered analysis**: Uses OpenAI/Anthropic for intelligent code review
+- **Security scanning**: Detects common security vulnerabilities
+- **Performance analysis**: Identifies performance bottlenecks
+- **Code quality assessment**: Evaluates code style and maintainability
+- **Automated review generation**: Creates detailed review comments and summaries
+- **Configurable analysis**: Customizable rules and thresholds
+- **CLI and programmatic API**: Use as command-line tool or integrate into workflows
+
+## Installation
+
+### From PyPI (Recommended)
+
+```bash
+pip install pr-review-agent
+```
+
+### From Source
+
+```bash
+git clone https://github.com/your-org/pr-review-agent.git
+cd pr-review-agent
+pip install -e .
+```
+
+## Quick Start
+
+### Command Line Usage
+
+1. **Set up authentication** (choose one method):
+
+   **Option A: Environment Variables**
+   ```bash
+   export GITHUB_TOKEN="your_github_token"
+   export OPENAI_API_KEY="your_openai_key"
+   ```
+
+   **Option B: Configuration File**
+   ```yaml
+   # config.yaml
+   git_providers:
+     - name: github
+       api_token: "your_github_token"
+       base_url: "https://api.github.com"
+
+   ai:
+     enabled: true
+     provider: openai
+     api_key: "your_openai_key"
+     model: "gpt-4"
+   ```
+
+2. **Review a pull request**:
+   ```bash
+   pr-review-agent --provider github --owner myorg --repo myproject --pr 123
+   ```
+
+### Programmatic Usage
+
+```python
+from pr_review_agent import PRReviewAgent
+from pr_review_agent.config import Config
+
+# Load configuration
+config = Config.from_env()
+
+# Create agent
+async with PRReviewAgent(config) as agent:
+    # Review pull request
+    result = await agent.review_pull_request(
+        provider_name="github",
+        owner="myorg",
+        repo="myproject",
+        pr_number=123
+    )
+
+    print(f"Review score: {result['overall_score']}")
+    print(f"Grade: {result['review']['grade']}")
+```
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `GITHUB_TOKEN` | GitHub personal access token | For GitHub |
+| `GITLAB_TOKEN` | GitLab personal access token | For GitLab |
+| `BITBUCKET_TOKEN` | Bitbucket app password | For Bitbucket |
+| `OPENAI_API_KEY` | OpenAI API key | For AI analysis |
+| `ANTHROPIC_API_KEY` | Anthropic API key | For AI analysis |
+
+### Configuration File
+
+Create a `config.yaml` file:
+
+```yaml
+# Git providers configuration
+git_providers:
+  - name: github
+    api_token: "your_github_token"
+    base_url: "https://api.github.com"
+
+  - name: gitlab
+    api_token: "your_gitlab_token"
+    base_url: "https://gitlab.com/api/v4"
+
+  - name: bitbucket
+    api_token: "your_bitbucket_token"
+    base_url: "https://api.bitbucket.org/2.0"
+
+# AI configuration
+ai:
+  enabled: true
+  provider: openai  # or "anthropic"
+  api_key: "your_api_key"
+  model: "gpt-4"
+  max_tokens: 2000
+  temperature: 0.3
+
+# Analysis configuration
+analysis:
+  enable_security_scan: true
+  enable_performance_scan: false
+  enable_style_scan: false
+  enable_complexity_scan: false
+
+# Logging configuration
+log_level: INFO
+log_file: "pr_review_agent.log"
+```
+
+## Supported Git Providers
+
+### GitHub
+
+- **Authentication**: Personal Access Token with `repo` and `pull_requests` scopes
+- **Features**: Full PR analysis, inline comments, review summaries
+- **Rate Limits**: 5000 requests per hour for authenticated users
+
+### GitLab
+
+- **Authentication**: Personal Access Token with `api` scope
+- **Features**: Merge request analysis, discussions, approvals
+- **Rate Limits**: 2000 requests per hour
+
+### Bitbucket
+
+- **Authentication**: App Password with `Repositories:Read` and `Pull Requests:Read` permissions
+- **Features**: Pull request analysis, comments
+- **Rate Limits**: 1000 requests per hour
+
+## AI Providers
+
+### OpenAI
+
+- **Models**: gpt-4, gpt-3.5-turbo
+- **Features**: Code analysis, suggestions, explanations
+- **Cost**: Based on token usage
+
+### Anthropic (Claude)
+
+- **Models**: claude-3-opus, claude-3-sonnet, claude-3-haiku
+- **Features**: High-quality code analysis and suggestions
+- **Cost**: Based on token usage
+
+## Analysis Types
+
+### Security Analysis
+
+Detects common security vulnerabilities:
+- SQL injection patterns
+- Command injection risks
+- Path traversal vulnerabilities
+- Hardcoded secrets and credentials
+- Insecure random values
+- Insecure deserialization
+
+### Performance Analysis
+
+Identifies performance issues:
+- Inefficient algorithms
+- Memory leaks
+- Unnecessary computations
+- Database query optimization
+- I/O bottlenecks
+
+### Style Analysis
+
+Checks code style and best practices:
+- PEP 8 compliance (Python)
+- Consistent formatting
+- Code organization
+- Documentation standards
+
+### Complexity Analysis
+
+Measures code complexity:
+- Cyclomatic complexity
+- Cognitive complexity
+- Maintainability index
+- Code duplication
+
+## Output Formats
+
+### Text (Default)
+
+```
+============================================================
+PR REVIEW AGENT - REVIEW RESULTS
+============================================================
+Repository: author/feature-branch -> main
+Title: Add new feature
+Author: username
+URL: https://github.com/org/repo/pull/123
+
+OVERALL ASSESSMENT
+--------------------
+Score: 0.847/1.0
+Grade: GOOD
+Issues Found: 3
+
+STATIC ANALYSIS ISSUES
+-------------------------
+1. [WARNING] Use of eval() function detected
+2. [INFO] Consider using f-strings instead of % formatting
+3. [WARNING] Missing docstring
+
+AI SUGGESTIONS
+---------------
+1. [STYLE] Consider adding type hints for better code clarity
+2. [PERFORMANCE] This function could be optimized for better performance
+
+FILE CHANGES
+------------
+- src/feature.py (modified): +45 -12
+- tests/test_feature.py (added): +23 -0
+```
+
+### JSON
+
+```json
+{
+  "review_id": "1234567890",
+  "pull_request": {
+    "id": "123",
+    "title": "Add new feature",
+    "author": "username",
+    "source_branch": "feature-branch",
+    "target_branch": "main"
+  },
+  "overall_score": 0.847,
+  "review": {
+    "grade": "GOOD",
+    "body": "Full review text...",
+    "comments": [...]
+  },
+  "analysis_results": [...],
+  "ai_feedback": [...]
+}
+```
+
+### Markdown
+
+```markdown
+# PR Review Agent - Review Results
+
+**Repository:** author/feature-branch → main
+**Title:** Add new feature
+**Author:** username
+**URL:** https://github.com/org/repo/pull/123
+
+## Overall Assessment
+- **Score:** 0.847/1.0
+- **Grade:** GOOD
+- **Issues Found:** 3
+
+## Static Analysis Issues
+- **WARNING:** Use of eval() function detected
+- **INFO:** Consider using f-strings instead of % formatting
+- **WARNING:** Missing docstring
+
+## AI Suggestions
+- **STYLE:** Consider adding type hints for better code clarity
+- **PERFORMANCE:** This function could be optimized for better performance
+
+## File Changes
+- `src/feature.py` (modified): +45 -12
+- `tests/test_feature.py` (added): +23 -0
+```
+
+## Integration Examples
+
+### GitHub Actions
+
+```yaml
+name: PR Review
+on: [pull_request]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install PR Review Agent
+        run: pip install pr-review-agent
+      - name: Review PR
+        run: pr-review-agent --provider github --owner ${{ github.repository_owner }} --repo ${{ github.event.repository.name }} --pr ${{ github.event.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+```
+
+### GitLab CI/CD
+
+```yaml
+review:
+  stage: review
+  image: python:3.9
+  script:
+    - pip install pr-review-agent
+    - pr-review-agent --provider gitlab --owner $CI_PROJECT_NAMESPACE --repo $CI_PROJECT_NAME --pr $CI_MERGE_REQUEST_IID
+  only:
+    - merge_requests
+```
+
+## Development
+
+### Project Structure
+
+```
+src/pr_review_agent/
+├── __init__.py
+├── main.py              # Main agent class
+├── config.py            # Configuration management
+├── cli.py               # Command-line interface
+├── providers/           # Git provider implementations
+│   ├── __init__.py
+│   ├── base.py          # Base provider class
+│   ├── github.py        # GitHub provider
+│   ├── gitlab.py        # GitLab provider
+│   └── bitbucket.py     # Bitbucket provider
+├── analyzers/           # Code analysis engines
+│   ├── __init__.py
+│   ├── base.py          # Base analyzer class
+│   └── security_analyzer.py  # Security analysis
+└── ai_engine.py         # AI integration
+```
+
+### Running Tests
+
+```bash
+# Install development dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Run with coverage
+pytest --cov=src/pr_review_agent
+
+# Run linting
+flake8 src/pr_review_agent
+black src/pr_review_agent
+```
+
+### Adding New Analyzers
+
+1. Create a new analyzer class inheriting from `CodeAnalyzerBase`
+2. Implement the `analyze` and `get_supported_extensions` methods
+3. Add the analyzer to the `AnalysisEngine` in `main.py`
+
+### Adding New Git Providers
+
+1. Create a new provider class inheriting from `GitProviderBase`
+2. Implement all abstract methods
+3. Add the provider to the `providers/__init__.py`
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Support
+
+- **Documentation**: [Link to docs]
+- **Issues**: [Link to issues]
+- **Discussions**: [Link to discussions]
+
+## Roadmap
+
+- [ ] Additional code analyzers (performance, style, complexity)
+- [ ] More git provider support (Azure DevOps, Gitea)
+- [ ] Webhook integration for automated reviews
+- [ ] Custom rule engine
+- [ ] Integration with popular CI/CD platforms
+- [ ] VS Code extension
+- [ ] Slack/Discord notifications

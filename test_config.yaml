@@ -1,0 +1,21 @@
+# Test configuration for PR Review Agent
+git_providers:
+  - name: github
+    api_token: "YOUR_GITHUB_TOKEN_HERE"
+    base_url: "https://api.github.com"
+
+ai:
+  enabled: false
+
+analysis:
+  enable_security_scan: true
+  enable_performance_scan: false
+  enable_style_scan: false
+  enable_complexity_scan: false
+
+log_level: INFO
+
+# Disable review creation for testing
+review:
+  enable_summary_comment: false
+  enable_inline_comments: false

@@ -1,0 +1,29 @@
+# Enhanced PR Review Agent Configuration
+git_providers:
+  - name: github
+    # api_token should not be stored in source-controlled config.
+    # Use the environment variable GITHUB_TOKEN when running the agent.
+    # api_token: "<set via env GITHUB_TOKEN>"
+    base_url: "https://api.github.com"
+
+ai:
+  enabled: true
+  provider: openai  # or anthropic
+  api_key: "your_openai_api_key_here"  # Replace with your actual OpenAI API key
+  model: "gpt-3.5-turbo"
+  max_tokens: 2000
+  temperature: 0.3
+
+analysis:
+  enable_security_scan: true
+  enable_performance_scan: true
+  enable_style_scan: true
+  enable_complexity_scan: true
+
+log_level: INFO
+
+# Enable review creation for detailed feedback
+review:
+  enable_summary_comment: true
+  enable_inline_comments: true
+  post_reviews: true
